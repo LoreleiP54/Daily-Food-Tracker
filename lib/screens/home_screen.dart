@@ -59,14 +59,19 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       // button to go to the food library screen
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // navigate to the food library so user can pick a food
-          Navigator.push(
+        onPressed: () async {
+          // wait for the user to come back, then refresh the totals
+          await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => FoodLibraryScreen(foodLibrary: foodLibrary),
+              builder: (context) => FoodLibraryScreen(
+                foodLibrary: foodLibrary,
+                dailyLog: dailyLog,
+              ),
             ),
           );
+          // rebuild so the new totals and entries show up
+          setState(() {});
         },
         child: Icon(Icons.add),
       ),

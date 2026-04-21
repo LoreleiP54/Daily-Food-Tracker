@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
+import '../models/daily_log.dart';
 import '../models/food_item.dart';
 import '../models/food_library.dart';
+import 'add_food_screen.dart';
+import 'log_servings_screen.dart';
 
 class FoodLibraryScreen extends StatefulWidget {
   // we pass the library in so the home screen can share the same one
   final FoodLibrary foodLibrary;
 
-  const FoodLibraryScreen({super.key, required this.foodLibrary});
+  // we also need the daily log so we can add entries from here
+  final DailyLog dailyLog;
+
+  const FoodLibraryScreen({
+    super.key,
+    required this.foodLibrary,
+    required this.dailyLog,
+  });
 
   @override
   State<FoodLibraryScreen> createState() => _FoodLibraryScreenState();
@@ -28,15 +38,33 @@ class _FoodLibraryScreenState extends State<FoodLibraryScreen> {
             subtitle: Text(
               "Calories per serving: " + food.caloriesPerServing.toString(),
             ),
+            // tap a food to log servings of it
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LogServingsScreen(
+                    foodItem: food,
+                    dailyLog: widget.dailyLog,
+                  ),
+                ),
+              );
+            },
           );
         },
       ),
       // button to add a new food item to the library
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          print(
-            "add new food pressed",
-          ); // will replace with navigation later but not today
+        onPressed: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  AddFoodScreen(foodLibrary: widget.foodLibrary),
+            ),
+          );
+          // rebuild so the new food shows up in the list
+          setState(() {});
         },
         child: Icon(Icons.add),
       ),
