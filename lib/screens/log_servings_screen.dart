@@ -21,8 +21,11 @@ class _LogServingsScreenState extends State<LogServingsScreen> {
   TextEditingController servingsController = TextEditingController();
 
   void logServings() {
+    // make sure they typed something
     if (servingsController.text == "") {
-      print("servings was empty");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please enter the number of servings")),
+      );
       return;
     }
 

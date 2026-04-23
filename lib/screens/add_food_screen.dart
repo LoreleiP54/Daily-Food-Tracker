@@ -20,8 +20,22 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
   TextEditingController fatController = TextEditingController();
 
   void saveFood() {
+    // make sure the name field isnt empty before saving
     if (nameController.text == "") {
-      print("name was empty, not saving");
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Please enter a food name")));
+      return;
+    }
+
+    // make sure all the number fields have something in them
+    if (caloriesController.text == "" ||
+        proteinController.text == "" ||
+        carbsController.text == "" ||
+        fatController.text == "") {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please fill in all nutrition fields")),
+      );
       return;
     }
 
