@@ -53,10 +53,31 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemBuilder: (context, index) {
                       // get the current food entry
                       LogEntry entry = dailyLog.entries[index];
-                      return ListTile(
-                        title: Text(entry.foodItem.name),
-                        subtitle: Text(
-                          "Servings: " + entry.servings.toString(),
+                      // wrap in Dismissible so the user can swipe to delete
+                      return Dismissible(
+                        key: Key(index.toString()), // needs a unique key
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          color: Colors.red,
+                          child: Padding(
+                            padding: EdgeInsets.only(right: 16.0),
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: Icon(Icons.delete, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                        onDismissed: (direction) {
+                          // remove the entry and refresh the totals
+                          setState(() {
+                            dailyLog.removeEntry(index);
+                          });
+                        },
+                        child: ListTile(
+                          title: Text(entry.foodItem.name),
+                          subtitle: Text(
+                            "Servings: " + entry.servings.toString(),
+                          ),
                         ),
                       );
                     },
