@@ -43,17 +43,24 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           // list of all food items logged today
           Expanded(
-            child: ListView.builder(
-              itemCount: dailyLog.entries.length,
-              itemBuilder: (context, index) {
-                // get the current food entry
-                LogEntry entry = dailyLog.entries[index];
-                return ListTile(
-                  title: Text(entry.foodItem.name),
-                  subtitle: Text("Servings: " + entry.servings.toString()),
-                );
-              },
-            ),
+            child: dailyLog.entries.isEmpty
+                // show a message if nothing has been logged yet
+                ? Center(
+                    child: Text("No food logged yet. Press + to add food."),
+                  )
+                : ListView.builder(
+                    itemCount: dailyLog.entries.length,
+                    itemBuilder: (context, index) {
+                      // get the current food entry
+                      LogEntry entry = dailyLog.entries[index];
+                      return ListTile(
+                        title: Text(entry.foodItem.name),
+                        subtitle: Text(
+                          "Servings: " + entry.servings.toString(),
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),

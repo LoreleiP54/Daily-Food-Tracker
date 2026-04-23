@@ -27,32 +27,36 @@ class _FoodLibraryScreenState extends State<FoodLibraryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("My Foods")),
-      body: ListView.builder(
-        itemCount: widget.foodLibrary.numberOfFoods,
-        itemBuilder: (context, index) {
-          // grab each food from the library
-          FoodItem food = widget.foodLibrary.getFood(index);
-          return ListTile(
-            title: Text(food.name),
-            // show summary of calories per serving
-            subtitle: Text(
-              "Calories per serving: " + food.caloriesPerServing.toString(),
-            ),
-            // tap a food to log servings of it
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => LogServingsScreen(
-                    foodItem: food,
-                    dailyLog: widget.dailyLog,
+      body: widget.foodLibrary.numberOfFoods == 0
+          // show a message if the library is empty
+          ? Center(child: Text("No foods saved yet. Press + to add one."))
+          : ListView.builder(
+              itemCount: widget.foodLibrary.numberOfFoods,
+              itemBuilder: (context, index) {
+                // grab each food from the library
+                FoodItem food = widget.foodLibrary.getFood(index);
+                return ListTile(
+                  title: Text(food.name),
+                  // show summary of calories per serving
+                  subtitle: Text(
+                    "Calories per serving: " +
+                        food.caloriesPerServing.toString(),
                   ),
-                ),
-              );
-            },
-          );
-        },
-      ),
+                  // tap a food to log servings of it
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => LogServingsScreen(
+                          foodItem: food,
+                          dailyLog: widget.dailyLog,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
       // button to add a new food item to the library
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
