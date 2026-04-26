@@ -40,10 +40,19 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
     }
 
     // convert the text inputs to numbers
-    double calories = double.parse(caloriesController.text);
-    double protein = double.parse(proteinController.text);
-    double carbs = double.parse(carbsController.text);
-    double fat = double.parse(fatController.text);
+    double calories, protein, carbs, fat;
+    try {
+      // wrapped in a try-catch since it will make an exception if the input is not numeric
+      calories = double.parse(caloriesController.text);
+      protein = double.parse(proteinController.text);
+      carbs = double.parse(carbsController.text);
+      fat = double.parse(fatController.text);
+    } catch(e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please ensure all nutrition fields are numeric")),
+      );
+      return;
+    }
 
     // create the new food item and add it to the library
     FoodItem newFood = FoodItem(
