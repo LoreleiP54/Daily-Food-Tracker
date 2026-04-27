@@ -46,10 +46,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const Divider(height: 24, thickness: 1),
                   // Using a helper method or repetitive rows for clean alignment, at bottom of this file
-                  _buildStatRow("Calories", dailyLog.totalCalories.toString()),
-                  _buildStatRow("Protein", "${dailyLog.totalProtein}g"),
-                  _buildStatRow("Carbs", "${dailyLog.totalCarbs}g"),
-                  _buildStatRow("Fat", "${dailyLog.totalFat}g"),
+                  _buildStatRow(
+                    "Calories",
+                    dailyLog.totalCalories.toStringAsFixed(1),
+                  ),
+                  _buildStatRow(
+                    "Protein",
+                    "${dailyLog.totalProtein.toStringAsFixed(1)}g",
+                  ),
+                  _buildStatRow(
+                    "Carbs",
+                    "${dailyLog.totalCarbs.toStringAsFixed(1)}g",
+                  ),
+                  _buildStatRow(
+                    "Fat",
+                    "${dailyLog.totalFat.toStringAsFixed(1)}g",
+                  ),
                 ],
               ),
             ),

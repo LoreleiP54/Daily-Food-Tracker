@@ -25,22 +25,26 @@ class FoodLibraryScreen extends StatefulWidget {
 class _FoodLibraryScreenState extends State<FoodLibraryScreen> {
   @override
   Widget build(BuildContext context) {
+    // sort the food list alphabetically before displaying it
+    List<FoodItem> sortedFoods = List.from(widget.foodLibrary.savedFoods);
+    sortedFoods.sort((a, b) => a.name.compareTo(b.name));
+
     return Scaffold(
       appBar: AppBar(title: Text("My Foods")),
       body: widget.foodLibrary.numberOfFoods == 0
           // show a message if the library is empty
           ? Center(child: Text("No foods saved yet. Press + to add one."))
           : ListView.builder(
-              itemCount: widget.foodLibrary.numberOfFoods,
+              itemCount: sortedFoods.length,
               itemBuilder: (context, index) {
-                // grab each food from the library
-                FoodItem food = widget.foodLibrary.getFood(index);
+                // grab each food from the sorted list
+                FoodItem food = sortedFoods[index];
                 return ListTile(
                   title: Text(food.name),
                   // show summary of calories per serving
                   subtitle: Text(
                     "Calories per serving: " +
-                        food.caloriesPerServing.toString(),
+                        food.caloriesPerServing.toStringAsFixed(1),
                   ),
                   // tap a food to log servings of it
                   onTap: () {

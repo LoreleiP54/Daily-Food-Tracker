@@ -58,21 +58,21 @@ class _LogServingsScreenState extends State<LogServingsScreen> {
             // show the nutrition info per serving so the user knows what they are logging
             Text(
               "Calories per serving: " +
-                  widget.foodItem.caloriesPerServing.toString(),
+                  widget.foodItem.caloriesPerServing.toStringAsFixed(1),
             ),
             Text(
               "Protein per serving: " +
-                  widget.foodItem.proteinPerServing.toString() +
+                  widget.foodItem.proteinPerServing.toStringAsFixed(1) +
                   "g",
             ),
             Text(
               "Carbs per serving: " +
-                  widget.foodItem.carbsPerServing.toString() +
+                  widget.foodItem.carbsPerServing.toStringAsFixed(1) +
                   "g",
             ),
             Text(
               "Fat per serving: " +
-                  widget.foodItem.fatPerServing.toString() +
+                  widget.foodItem.fatPerServing.toStringAsFixed(1) +
                   "g",
             ),
             SizedBox(height: 20),
