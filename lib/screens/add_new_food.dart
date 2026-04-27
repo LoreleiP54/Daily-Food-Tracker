@@ -58,7 +58,9 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
                 if (name.isEmpty || calories == null || protein == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Please enter a valid name, calories, and protein.'),
+                      content: Text(
+                        'Please enter a valid name, calories, and protein.',
+                      ),
                     ),
                   );
                   return;

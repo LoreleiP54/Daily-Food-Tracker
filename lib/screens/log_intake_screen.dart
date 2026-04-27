@@ -7,7 +7,9 @@ class LogIntakeScreen extends StatelessWidget {
   const LogIntakeScreen({super.key});
 
   void _showServingsDialog(BuildContext context, FoodItem food) {
-    final TextEditingController servingsController = TextEditingController(text: "1.0");
+    final TextEditingController servingsController = TextEditingController(
+      text: "1.0",
+    );
 
     showDialog(
       context: context,
@@ -22,7 +24,9 @@ class LogIntakeScreen extends StatelessWidget {
             const SizedBox(height: 15),
             TextField(
               controller: servingsController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               decoration: const InputDecoration(
                 labelText: 'Number of Servings',
                 border: OutlineInputBorder(),
@@ -38,15 +42,16 @@ class LogIntakeScreen extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
+              final double servings =
+                  double.tryParse(servingsController.text) ?? 1.0;
 
-              final double servings = double.tryParse(servingsController.text) ?? 1.0;
-              
-              Provider.of<NutritionProvider>(context, listen: false)
-                  .logConsumption(food, servings);
+              Provider.of<NutritionProvider>(
+                context,
+                listen: false,
+              ).logConsumption(food, servings);
 
               Navigator.pop(buildContext);
               Navigator.pop(context);
-              
             },
             child: const Text('Add to Daily Log'),
           ),
@@ -61,9 +66,7 @@ class LogIntakeScreen extends StatelessWidget {
     final List<FoodItem> library = nutritionProvider.savedFoods;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Log Food Intake'),
-      ),
+      appBar: AppBar(title: const Text('Log Food Intake')),
       body: library.isEmpty
           ? Center(
               child: Column(
@@ -75,10 +78,13 @@ class LogIntakeScreen extends StatelessWidget {
                     'Food library is empty.',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const Text('Add food definitions in the "Create Food" screen first.'),
+                  const Text(
+                    'Add food definitions in the "Create Food" screen first.',
+                  ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () => Navigator.pushReplacementNamed(context, '/add-food'),
+                    onPressed: () =>
+                        Navigator.pushReplacementNamed(context, '/add-food'),
                     child: const Text('Go to Create Food'),
                   ),
                 ],
@@ -91,8 +97,13 @@ class LogIntakeScreen extends StatelessWidget {
               itemBuilder: (buildContext, i) {
                 final food = library[i];
                 return ListTile(
-                  title: Text(food.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text('${food.calories.toStringAsFixed(0)} Cal | ${food.protein}g Protein'),
+                  title: Text(
+                    food.name,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(
+                    '${food.calories.toStringAsFixed(0)} Cal | ${food.protein}g Protein',
+                  ),
                   onTap: () => _showServingsDialog(context, food),
                 );
               },
