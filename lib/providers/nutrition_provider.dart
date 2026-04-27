@@ -96,4 +96,45 @@ class NutritionProvider with ChangeNotifier {
     _saveToDisk();
     notifyListeners();
   }
+
+  void removeFromDailyLog(String id) {
+    _dailyLog.removeWhere((item) => item.id == id);
+    _saveToDisk();
+    notifyListeners();
+  }
+
+  void updateDailyLogServings(String id, double servings) {
+    final index = _dailyLog.indexWhere((item) => item.id == id);
+    if (index != -1) {
+      _dailyLog[index].servings = servings;
+      _saveToDisk();
+      notifyListeners();
+    }
+  }
+
+  void removeFoodFromLibrary(String id) {
+    _savedFoods.removeWhere((item) => item.id == id);
+    _saveToDisk();
+    notifyListeners();
+  }
+
+  void updateFoodInLibrary(
+    String id,
+    String name,
+    double calories,
+    double protein,
+  ) {
+    final index = _savedFoods.indexWhere((item) => item.id == id);
+    if (index != -1) {
+      _savedFoods[index] = FoodItem(
+        id: id,
+        name: name,
+        calories: calories,
+        protein: protein,
+        servings: _savedFoods[index].servings,
+      );
+      _saveToDisk();
+      notifyListeners();
+    }
+  }
 }

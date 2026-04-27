@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/food_item.dart';
 import '../providers/nutrition_provider.dart';
 
 class AppShell extends StatelessWidget {
@@ -34,12 +35,38 @@ class AppShell extends StatelessWidget {
                     itemCount: nutrition.dailyLog.length,
                     itemBuilder: (context, i) {
                       final item = nutrition.dailyLog[i];
-                      return ListTile(
-                        title: Text(item.name),
-                        subtitle: Text('${item.servings} servings'),
-                        trailing: Text(
-                          '${(item.calories * item.servings).toStringAsFixed(0)} Cal',
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                      return Dismissible(
+                        key: Key(item.id),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          alignment: Alignment.centerRight,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          color: Colors.red,
+                          child: const Icon(Icons.delete, color: Colors.white),
+                        ),
+                        onDismissed: (_) => Provider.of<NutritionProvider>(
+                          context,
+                          listen: false,
+                        ).removeFromDailyLog(item.id),
+                        child: ListTile(
+                          title: Text(item.name),
+                          subtitle: Text('${item.servings} servings'),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                '${(item.calories * item.servings).toStringAsFixed(0)} Cal',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.edit, size: 20),
+                                onPressed: () =>
+                                    _showEditServingsDialog(context, item),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },
@@ -49,6 +76,44 @@ class AppShell extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _showEditServingsDialog(BuildContext context, FoodItem item) {
+    final controller = TextEditingController(text: item.servings.toString());
+    showDialog(
+      context: context,
+      builder: (buildContext) => AlertDialog(
+        title: Text('Edit ${item.name}'),
+        content: TextField(
+          controller: controller,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: const InputDecoration(
+            labelText: 'Number of Servings',
+            border: OutlineInputBorder(),
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(buildContext),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final servings = double.tryParse(controller.text);
+              if (servings != null && servings > 0) {
+                Provider.of<NutritionProvider>(
+                  context,
+                  listen: false,
+                ).updateDailyLogServings(item.id, servings);
+              }
+              Navigator.pop(buildContext);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    ).then((_) => controller.dispose());
   }
 
   Widget _buildActionPanel(BuildContext context) {
@@ -102,20 +167,34 @@ class AppShell extends StatelessWidget {
           children: [
             Column(
               children: [
-                const Text('Daily Calories', style: TextStyle(color: Colors.grey)),
+                const Text(
+                  'Daily Calories',
+                  style: TextStyle(color: Colors.grey),
+                ),
                 Text(
                   nutrition.totalDailyCalories.toStringAsFixed(0),
-                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black),
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                 ),
               ],
             ),
             Container(width: 1, height: 40, color: Colors.grey[300]),
             Column(
               children: [
-                const Text('Daily Protein (g)', style: TextStyle(color: Colors.grey)),
+                const Text(
+                  'Daily Protein (g)',
+                  style: TextStyle(color: Colors.grey),
+                ),
                 Text(
                   nutrition.totalDailyProtein.toStringAsFixed(0),
-                  style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black),
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
                 ),
               ],
             ),

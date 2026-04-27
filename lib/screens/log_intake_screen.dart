@@ -60,6 +60,96 @@ class LogIntakeScreen extends StatelessWidget {
     );
   }
 
+  void _showEditLibraryItemDialog(BuildContext context, FoodItem food) {
+    final nameController = TextEditingController(text: food.name);
+    final calController = TextEditingController(text: food.calories.toString());
+    final proController = TextEditingController(text: food.protein.toString());
+    showDialog(
+      context: context,
+      builder: (buildContext) => AlertDialog(
+        title: const Text('Edit Food'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: 'Food Name'),
+            ),
+            TextField(
+              controller: calController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Calories per serving',
+              ),
+            ),
+            TextField(
+              controller: proController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(
+                labelText: 'Protein per serving (g)',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(buildContext),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final name = nameController.text.trim();
+              final calories = double.tryParse(calController.text);
+              final protein = double.tryParse(proController.text);
+              if (name.isNotEmpty && calories != null && protein != null) {
+                Provider.of<NutritionProvider>(
+                  context,
+                  listen: false,
+                ).updateFoodInLibrary(food.id, name, calories, protein);
+              }
+              Navigator.pop(buildContext);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    ).then((_) {
+      nameController.dispose();
+      calController.dispose();
+      proController.dispose();
+    });
+  }
+
+  void _confirmDeleteLibraryItem(BuildContext context, FoodItem food) {
+    showDialog(
+      context: context,
+      builder: (buildContext) => AlertDialog(
+        title: const Text('Delete Food'),
+        content: Text('Remove "${food.name}" from the library?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(buildContext),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () {
+              Provider.of<NutritionProvider>(
+                context,
+                listen: false,
+              ).removeFoodFromLibrary(food.id);
+              Navigator.pop(buildContext);
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final nutritionProvider = Provider.of<NutritionProvider>(context);
@@ -105,6 +195,19 @@ class LogIntakeScreen extends StatelessWidget {
                     '${food.calories.toStringAsFixed(0)} Cal | ${food.protein}g Protein',
                   ),
                   onTap: () => _showServingsDialog(context, food),
+                  trailing: PopupMenuButton<String>(
+                    onSelected: (value) {
+                      if (value == 'edit') {
+                        _showEditLibraryItemDialog(context, food);
+                      } else if (value == 'delete') {
+                        _confirmDeleteLibraryItem(context, food);
+                      }
+                    },
+                    itemBuilder: (_) => const [
+                      PopupMenuItem(value: 'edit', child: Text('Edit')),
+                      PopupMenuItem(value: 'delete', child: Text('Delete')),
+                    ],
+                  ),
                 );
               },
             ),
