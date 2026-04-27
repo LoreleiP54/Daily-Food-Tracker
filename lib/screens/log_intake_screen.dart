@@ -78,7 +78,7 @@ class LogIntakeScreen extends StatelessWidget {
                   const Text('Add food definitions in the "Create Food" screen first.'),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () => Navigator.pushReplacementNamed(context, '/create-food'),
+                    onPressed: () => Navigator.pushReplacementNamed(context, '/add-food'),
                     child: const Text('Go to Create Food'),
                   ),
                 ],
