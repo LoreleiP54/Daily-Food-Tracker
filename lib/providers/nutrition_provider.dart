@@ -72,6 +72,7 @@ class NutritionProvider with ChangeNotifier {
       fat: food.fat,
       carbs: food.carbs,
       servings: newServings,
+      loggedDate: DateTime.now(),
     );
     _dailyLog.add(logEntry);
     _saveToDisk();
@@ -93,6 +94,7 @@ class NutritionProvider with ChangeNotifier {
       fat: fat,
       carbs: carbs,
       servings: 1.0,
+      loggedDate: DateTime.now(),
     );
     _savedFoods.add(newItem);
     _saveToDisk();
@@ -100,16 +102,29 @@ class NutritionProvider with ChangeNotifier {
   }
 
   void logConsumption(FoodItem baseFood, double servings) {
-    final logEntry = FoodItem(
-      id: _generateId(),
-      name: baseFood.name,
-      calories: baseFood.calories,
-      protein: baseFood.protein,
-      fat: baseFood.fat,
-      carbs: baseFood.carbs,
-      servings: servings,
+    final today = DateTime.now();
+    final existingIndex = _dailyLog.indexWhere(
+      (item) =>
+          item.name == baseFood.name &&
+          item.loggedDate.year == today.year &&
+          item.loggedDate.month == today.month &&
+          item.loggedDate.day == today.day,
     );
-    _dailyLog.add(logEntry);
+    if (existingIndex != -1) {
+      _dailyLog[existingIndex].servings += servings;
+    } else {
+      final logEntry = FoodItem(
+        id: _generateId(),
+        name: baseFood.name,
+        calories: baseFood.calories,
+        protein: baseFood.protein,
+        fat: baseFood.fat,
+        carbs: baseFood.carbs,
+        servings: servings,
+        loggedDate: DateTime.now(),
+      );
+      _dailyLog.add(logEntry);
+    }
     _saveToDisk();
     notifyListeners();
   }
@@ -153,9 +168,21 @@ class NutritionProvider with ChangeNotifier {
         fat: fat,
         carbs: carbs,
         servings: _savedFoods[index].servings,
+        loggedDate: DateTime.now(),
       );
       _saveToDisk();
       notifyListeners();
     }
+  }
+
+  List<FoodItem> getLogForDay(DateTime day) {
+    return _dailyLog
+        .where(
+          (item) =>
+              item.loggedDate.year == day.year &&
+              item.loggedDate.month == day.month &&
+              item.loggedDate.day == day.day,
+        )
+        .toList();
   }
 }

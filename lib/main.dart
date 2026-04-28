@@ -21,13 +21,11 @@ class FoodTrackerApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Daily Food Tracker',
+      title: 'Daily Nutrition Tracker',
       theme: ThemeData(primarySwatch: Colors.red),
       initialRoute: '/',
       routes: {
         '/': (context) => const AppShell(),
-        '/add-food': (context) => const AddFoodScreen(),
-        '/log-intake': (context) => const LogIntakeScreen(),
       },
     );
   }

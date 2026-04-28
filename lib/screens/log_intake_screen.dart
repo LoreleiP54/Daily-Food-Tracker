@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/nutrition_provider.dart';
 import '../models/food_item.dart';
+import 'add_new_food.dart';
 
 class LogIntakeScreen extends StatelessWidget {
-  const LogIntakeScreen({super.key});
+  final void Function(int) onSwitchTab;
+  const LogIntakeScreen({super.key, required this.onSwitchTab});
 
   void _showServingsDialog(BuildContext context, FoodItem food) {
     final TextEditingController servingsController = TextEditingController(
@@ -53,7 +55,6 @@ class LogIntakeScreen extends StatelessWidget {
               ).logConsumption(food, servings);
 
               Navigator.pop(buildContext);
-              Navigator.pop(context);
             },
             child: const Text('Add to Daily Log'),
           ),
@@ -200,7 +201,10 @@ class LogIntakeScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.add),
             tooltip: 'Create new food',
-            onPressed: () => Navigator.pushNamed(context, '/add-food'),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AddFoodScreen()),
+            ),
           ),
         ],
       ),
@@ -215,15 +219,8 @@ class LogIntakeScreen extends StatelessWidget {
                     'Food library is empty.',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  const Text(
-                    'Add food definitions in the "Create Food" screen first.',
-                  ),
+                  const Text('Add food definitions by pressing the + '),
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () =>
-                        Navigator.pushReplacementNamed(context, '/add-food'),
-                    child: const Text('Go to Create Food'),
-                  ),
                 ],
               ),
             )

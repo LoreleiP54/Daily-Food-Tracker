@@ -5,6 +5,8 @@ class FoodItem {
   final double protein;
   final double fat;
   final double carbs;
+  final DateTime loggedDate;
+
   double servings;
   double totalCalories;
   double totalProtein;
@@ -18,6 +20,7 @@ class FoodItem {
     required this.protein,
     required this.fat,
     required this.carbs,
+    required this.loggedDate,
     this.servings = 1.0,
     this.totalCalories = 0,
     this.totalProtein = 0,
@@ -34,6 +37,7 @@ class FoodItem {
       'fat': fat,
       'carbs': carbs,
       'servings': servings,
+      'loggedDate': loggedDate.toIso8601String(),
     };
   }
 
@@ -46,6 +50,7 @@ class FoodItem {
       fat: map['fat'],
       carbs: map['carbs'],
       servings: map['servings'],
+      loggedDate: DateTime.parse(map['loggedDate']),
     );
   }
 }
