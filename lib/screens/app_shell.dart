@@ -198,6 +198,40 @@ class AppShell extends StatelessWidget {
                 ),
               ],
             ),
+            Container(width: 1, height: 40, color: Colors.grey[300]),
+            Column(
+              children: [
+                const Text(
+                  'Daily Fat (g)',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                Text(
+                  nutrition.totalDailyFat.toStringAsFixed(0),
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
+            ),
+            Container(width: 1, height: 40, color: Colors.grey[300]),
+            Column(
+              children: [
+                const Text(
+                  'Daily Carbs (g)',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                Text(
+                  nutrition.totalDailyCarbs.toStringAsFixed(0),
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),

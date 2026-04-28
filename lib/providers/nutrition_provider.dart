@@ -18,7 +18,10 @@ class NutritionProvider with ChangeNotifier {
       _dailyLog.fold(0, (sum, item) => sum + (item.calories * item.servings));
   double get totalDailyProtein =>
       _dailyLog.fold(0, (sum, item) => sum + (item.protein * item.servings));
-
+  double get totalDailyFat =>
+      _dailyLog.fold(0, (sum, item) => sum + (item.fat * item.servings));
+  double get totalDailyCarbs =>
+      _dailyLog.fold(0, (sum, item) => sum + (item.carbs * item.servings));
   Future<void> _saveToDisk() async {
     final prefs = await SharedPreferences.getInstance();
     final logData = json.encode(_dailyLog.map((item) => item.toMap()).toList());
@@ -64,6 +67,8 @@ class NutritionProvider with ChangeNotifier {
       name: food.name,
       calories: food.calories,
       protein: food.protein,
+      fat: food.fat,
+      carbs: food.carbs,
       servings: newServings,
     );
     _dailyLog.add(logEntry);
@@ -71,12 +76,20 @@ class NutritionProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addFoodToLibrary(String name, double calories, double protein) {
+  void addFoodToLibrary(
+    String name,
+    double calories,
+    double protein,
+    double fat,
+    double carbs,
+  ) {
     final newItem = FoodItem(
       id: DateTime.now().toString(),
       name: name,
       calories: calories,
       protein: protein,
+      fat: 0,
+      carbs: 0,
       servings: 1.0,
     );
     _savedFoods.add(newItem);
@@ -90,6 +103,8 @@ class NutritionProvider with ChangeNotifier {
       name: baseFood.name,
       calories: baseFood.calories,
       protein: baseFood.protein,
+      fat: baseFood.fat,
+      carbs: baseFood.carbs,
       servings: servings,
     );
     _dailyLog.add(logEntry);
@@ -123,6 +138,8 @@ class NutritionProvider with ChangeNotifier {
     String name,
     double calories,
     double protein,
+    double fat,
+    double carbs,
   ) {
     final index = _savedFoods.indexWhere((item) => item.id == id);
     if (index != -1) {
@@ -131,6 +148,8 @@ class NutritionProvider with ChangeNotifier {
         name: name,
         calories: calories,
         protein: protein,
+        fat: fat,
+        carbs: carbs,
         servings: _savedFoods[index].servings,
       );
       _saveToDisk();

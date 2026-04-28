@@ -20,7 +20,9 @@ class LogIntakeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('${food.calories.toStringAsFixed(0)} Cal per serving'),
-            Text('${food.protein.toStringAsFixed(0)} g of protein per serving'),
+            Text('${food.protein.toStringAsFixed(1)}g protein '),
+            Text('${food.fat.toStringAsFixed(1)}g fat '),
+            Text('${food.carbs.toStringAsFixed(1)}g carbs '),
             const SizedBox(height: 15),
             TextField(
               controller: servingsController,
@@ -64,32 +66,50 @@ class LogIntakeScreen extends StatelessWidget {
     final nameController = TextEditingController(text: food.name);
     final calController = TextEditingController(text: food.calories.toString());
     final proController = TextEditingController(text: food.protein.toString());
+    final fatController = TextEditingController(text: food.fat.toString());
+    final carbController = TextEditingController(text: food.carbs.toString());
     showDialog(
       context: context,
       builder: (buildContext) => AlertDialog(
         title: const Text('Edit Food'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(labelText: 'Food Name'),
-            ),
-            TextField(
-              controller: calController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Calories per serving',
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Food Name'),
               ),
-            ),
-            TextField(
-              controller: proController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Protein per serving (g)',
+              TextField(
+                controller: calController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Calories per serving',
+                ),
               ),
-            ),
-          ],
+              TextField(
+                controller: proController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Protein per serving (g)',
+                ),
+              ),
+              TextField(
+                controller: fatController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Fat per serving (g)',
+                ),
+              ),
+              TextField(
+                controller: carbController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Carbs per serving (g)',
+                ),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -101,11 +121,24 @@ class LogIntakeScreen extends StatelessWidget {
               final name = nameController.text.trim();
               final calories = double.tryParse(calController.text);
               final protein = double.tryParse(proController.text);
-              if (name.isNotEmpty && calories != null && protein != null) {
+              final fat = double.tryParse(fatController.text);
+              final carbs = double.tryParse(carbController.text);
+              if (name.isNotEmpty &&
+                  calories != null &&
+                  protein != null &&
+                  fat != null &&
+                  carbs != null) {
                 Provider.of<NutritionProvider>(
                   context,
                   listen: false,
-                ).updateFoodInLibrary(food.id, name, calories, protein);
+                ).updateFoodInLibrary(
+                  food.id,
+                  name,
+                  calories,
+                  protein,
+                  fat,
+                  carbs,
+                );
               }
               Navigator.pop(buildContext);
             },
@@ -117,6 +150,8 @@ class LogIntakeScreen extends StatelessWidget {
       nameController.dispose();
       calController.dispose();
       proController.dispose();
+      fatController.dispose();
+      carbController.dispose();
     });
   }
 
@@ -192,7 +227,7 @@ class LogIntakeScreen extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(
-                    '${food.calories.toStringAsFixed(0)} Cal | ${food.protein}g Protein',
+                    '${food.calories.toStringAsFixed(0)} Cal | ${food.protein}g Protein | ${food.fat}g Fat | ${food.carbs}g Carbs',
                   ),
                   onTap: () => _showServingsDialog(context, food),
                   trailing: PopupMenuButton<String>(

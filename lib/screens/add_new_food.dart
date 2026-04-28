@@ -13,12 +13,16 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
   final _nameController = TextEditingController();
   final _calController = TextEditingController();
   final _proController = TextEditingController();
+  final _fatController = TextEditingController();
+  final _carbController = TextEditingController();
 
   @override
   void dispose() {
     _nameController.dispose();
     _calController.dispose();
     _proController.dispose();
+    _fatController.dispose();
+    _carbController.dispose();
     super.dispose();
   }
 
@@ -48,18 +52,34 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
               ),
               keyboardType: TextInputType.number,
             ),
+            TextField(
+              controller: _fatController,
+              decoration: const InputDecoration(labelText: 'Fat per serving'),
+              keyboardType: TextInputType.number,
+            ),
+            TextField(
+              controller: _carbController,
+              decoration: const InputDecoration(labelText: 'Carbs per serving'),
+              keyboardType: TextInputType.number,
+            ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 final name = _nameController.text.trim();
                 final calories = double.tryParse(_calController.text);
                 final protein = double.tryParse(_proController.text);
+                final fat = double.tryParse(_fatController.text);
+                final carbs = double.tryParse(_carbController.text);
 
-                if (name.isEmpty || calories == null || protein == null) {
+                if (name.isEmpty ||
+                    calories == null ||
+                    protein == null ||
+                    fat == null ||
+                    carbs == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text(
-                        'Please enter a valid name, calories, and protein.',
+                        'Please enter a valid name, calories, protein, fat, and carbs.',
                       ),
                     ),
                   );
@@ -69,7 +89,7 @@ class _AddFoodScreenState extends State<AddFoodScreen> {
                 Provider.of<NutritionProvider>(
                   context,
                   listen: false,
-                ).addFoodToLibrary(name, calories, protein);
+                ).addFoodToLibrary(name, calories, protein, fat, carbs);
                 Navigator.pop(context);
               },
               child: const Text('Save to Library'),

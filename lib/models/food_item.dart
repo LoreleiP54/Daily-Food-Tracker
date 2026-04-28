@@ -1,20 +1,28 @@
 class FoodItem {
   final String id;
   final String name;
-  final double calories; 
-  final double protein;  // tentative limited nutrition info, ideally would be all posssible information but could easily be overkill
+  final double calories;
+  final double protein;
+  final double fat;
+  final double carbs;
   double servings;
   double totalCalories;
   double totalProtein;
+  double totalFat;
+  double totalCarbs;
 
   FoodItem({
     required this.id,
     required this.name,
     required this.calories,
     required this.protein,
+    required this.fat,
+    required this.carbs,
     this.servings = 1.0,
     this.totalCalories = 0,
     this.totalProtein = 0,
+    this.totalFat = 0,
+    this.totalCarbs = 0,
   });
 
   Map<String, dynamic> toMap() {
@@ -23,6 +31,8 @@ class FoodItem {
       'name': name,
       'calories': calories,
       'protein': protein,
+      'fat': fat,
+      'carbs': carbs,
       'servings': servings,
     };
   }
@@ -33,6 +43,8 @@ class FoodItem {
       name: map['name'],
       calories: map['calories'],
       protein: map['protein'],
+      fat: map['fat'],
+      carbs: map['carbs'],
       servings: map['servings'],
     );
   }
