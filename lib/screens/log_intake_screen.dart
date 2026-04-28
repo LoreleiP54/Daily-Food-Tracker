@@ -139,8 +139,17 @@ class LogIntakeScreen extends StatelessWidget {
                   fat,
                   carbs,
                 );
+                Navigator.pop(buildContext);
+              } else {
+                // Might want to change how this displays?
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Please enter a valid name, calories, protein, fat, and carbs.',
+                    ),
+                  ),
+                );
               }
-              Navigator.pop(buildContext);
             },
             child: const Text('Save'),
           ),
