@@ -113,7 +113,7 @@ class AppShell extends StatelessWidget {
           ),
         ],
       ),
-    ).then((_) => controller.dispose());
+    );
   }
 
   Widget _buildActionPanel(BuildContext context) {
@@ -161,73 +161,40 @@ class AppShell extends StatelessWidget {
       margin: const EdgeInsets.all(16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+        padding: const EdgeInsets.all(20),
+        child: Column(
           children: [
-            Column(
+            Row(
               children: [
-                const Text(
-                  'Daily Calories',
-                  style: TextStyle(color: Colors.grey),
+                Expanded(
+                  child: _buildStatCell(
+                    'Calories',
+                    nutrition.totalDailyCalories.toStringAsFixed(0),
+                  ),
                 ),
-                Text(
-                  nutrition.totalDailyCalories.toStringAsFixed(0),
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                Container(width: 1, height: 50, color: Colors.grey[300]),
+                Expanded(
+                  child: _buildStatCell(
+                    'Protein (g)',
+                    nutrition.totalDailyProtein.toStringAsFixed(1),
                   ),
                 ),
               ],
             ),
-            Container(width: 1, height: 40, color: Colors.grey[300]),
-            Column(
+            const Divider(height: 24),
+            Row(
               children: [
-                const Text(
-                  'Daily Protein (g)',
-                  style: TextStyle(color: Colors.grey),
-                ),
-                Text(
-                  nutrition.totalDailyProtein.toStringAsFixed(0),
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                Expanded(
+                  child: _buildStatCell(
+                    'Fat (g)',
+                    nutrition.totalDailyFat.toStringAsFixed(1),
                   ),
                 ),
-              ],
-            ),
-            Container(width: 1, height: 40, color: Colors.grey[300]),
-            Column(
-              children: [
-                const Text(
-                  'Daily Fat (g)',
-                  style: TextStyle(color: Colors.grey),
-                ),
-                Text(
-                  nutrition.totalDailyFat.toStringAsFixed(0),
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
-            Container(width: 1, height: 40, color: Colors.grey[300]),
-            Column(
-              children: [
-                const Text(
-                  'Daily Carbs (g)',
-                  style: TextStyle(color: Colors.grey),
-                ),
-                Text(
-                  nutrition.totalDailyCarbs.toStringAsFixed(0),
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                Container(width: 1, height: 50, color: Colors.grey[300]),
+                Expanded(
+                  child: _buildStatCell(
+                    'Carbs (g)',
+                    nutrition.totalDailyCarbs.toStringAsFixed(1),
                   ),
                 ),
               ],
@@ -235,6 +202,23 @@ class AppShell extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildStatCell(String label, String value) {
+    return Column(
+      children: [
+        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+      ],
     );
   }
 }

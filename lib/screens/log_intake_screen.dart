@@ -46,9 +46,9 @@ class LogIntakeScreen extends StatelessWidget {
             onPressed: () {
               final double servings =
                   double.tryParse(servingsController.text) ?? 1.0;
-
+              if (servings <= 0) return;
               Provider.of<NutritionProvider>(
-                context,
+                buildContext,
                 listen: false,
               ).logConsumption(food, servings);
 
@@ -129,7 +129,7 @@ class LogIntakeScreen extends StatelessWidget {
                   fat != null &&
                   carbs != null) {
                 Provider.of<NutritionProvider>(
-                  context,
+                  buildContext,
                   listen: false,
                 ).updateFoodInLibrary(
                   food.id,
@@ -142,7 +142,7 @@ class LogIntakeScreen extends StatelessWidget {
                 Navigator.pop(buildContext);
               } else {
                 // Might want to change how this displays?
-                ScaffoldMessenger.of(context).showSnackBar(
+                ScaffoldMessenger.of(buildContext).showSnackBar(
                   const SnackBar(
                     content: Text(
                       'Please enter a valid name, calories, protein, fat, and carbs.',
@@ -155,13 +155,7 @@ class LogIntakeScreen extends StatelessWidget {
           ),
         ],
       ),
-    ).then((_) {
-      nameController.dispose();
-      calController.dispose();
-      proController.dispose();
-      fatController.dispose();
-      carbController.dispose();
-    });
+    );
   }
 
   void _confirmDeleteLibraryItem(BuildContext context, FoodItem food) {
@@ -182,7 +176,7 @@ class LogIntakeScreen extends StatelessWidget {
             ),
             onPressed: () {
               Provider.of<NutritionProvider>(
-                context,
+                buildContext,
                 listen: false,
               ).removeFoodFromLibrary(food.id);
               Navigator.pop(buildContext);
@@ -200,7 +194,16 @@ class LogIntakeScreen extends StatelessWidget {
     final List<FoodItem> library = nutritionProvider.savedFoods;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Log Food Intake')),
+      appBar: AppBar(
+        title: const Text('Log Food Intake'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            tooltip: 'Create new food',
+            onPressed: () => Navigator.pushNamed(context, '/add-food'),
+          ),
+        ],
+      ),
       body: library.isEmpty
           ? Center(
               child: Column(

@@ -13,6 +13,8 @@ class NutritionProvider with ChangeNotifier {
   NutritionProvider() {
     loadData();
   }
+  static int _idCounter = 0;
+  String _generateId() => '${++_idCounter}';
 
   double get totalDailyCalories =>
       _dailyLog.fold(0, (sum, item) => sum + (item.calories * item.servings));
@@ -63,7 +65,7 @@ class NutritionProvider with ChangeNotifier {
 
   void addSavedFoodToLog(FoodItem food, double newServings) {
     final logEntry = FoodItem(
-      id: DateTime.now().toString(),
+      id: _generateId(),
       name: food.name,
       calories: food.calories,
       protein: food.protein,
@@ -84,12 +86,12 @@ class NutritionProvider with ChangeNotifier {
     double carbs,
   ) {
     final newItem = FoodItem(
-      id: DateTime.now().toString(),
+      id: _generateId(),
       name: name,
       calories: calories,
       protein: protein,
-      fat: 0,
-      carbs: 0,
+      fat: fat,
+      carbs: carbs,
       servings: 1.0,
     );
     _savedFoods.add(newItem);
@@ -99,7 +101,7 @@ class NutritionProvider with ChangeNotifier {
 
   void logConsumption(FoodItem baseFood, double servings) {
     final logEntry = FoodItem(
-      id: DateTime.now().toString(),
+      id: _generateId(),
       name: baseFood.name,
       calories: baseFood.calories,
       protein: baseFood.protein,
