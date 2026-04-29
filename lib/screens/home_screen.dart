@@ -1,162 +1,180 @@
 import 'package:flutter/material.dart';
-import '../models/daily_log.dart';
+import 'package:provider/provider.dart';
 import '../models/food_item.dart';
-import '../models/food_library.dart';
-import 'food_library_screen.dart';
+import '../providers/nutrition_provider.dart';
 
-class HomeScreen extends StatefulWidget {
+
+
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  // this holds everything the user ate today
-  DailyLog dailyLog = DailyLog();
-
-  // this holds all the saved food items the user has created
-  FoodLibrary foodLibrary = FoodLibrary();
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Daily Nutrition Tracker",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        elevation: 0,
-      ),
-      body: Column(
-        children: [
-          // show the totals at the top of the screen
-          Card(
-            elevation: 2,
-            margin: EdgeInsets.all(16.0),
-            child: Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Today's Totals",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
-                  const Divider(height: 24, thickness: 1),
-                  // Using a helper method or repetitive rows for clean alignment, at bottom of this file
-                  _buildStatRow(
-                    "Calories",
-                    dailyLog.totalCalories.toStringAsFixed(1),
-                  ),
-                  _buildStatRow(
-                    "Protein",
-                    "${dailyLog.totalProtein.toStringAsFixed(1)}g",
-                  ),
-                  _buildStatRow(
-                    "Carbs",
-                    "${dailyLog.totalCarbs.toStringAsFixed(1)}g",
-                  ),
-                  _buildStatRow(
-                    "Fat",
-                    "${dailyLog.totalFat.toStringAsFixed(1)}g",
-                  ),
-                ],
-              ),
+    final nutrition = Provider.of<NutritionProvider>(context);
+
+    return Column(
+      children: [
+        _buildSummaryCard(nutrition),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16.0),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "Today's Food Consumed",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
-
-          // list of all food items logged today
-          Expanded(
-            child: dailyLog.entries.isEmpty
-                // show a message if nothing has been logged yet
-                ? Center(
-                    child: Text("No food logged yet. Press + to add food."),
-                  )
-                : ListView.builder(
-                    itemCount: dailyLog.entries.length,
-                    itemBuilder: (context, index) {
-                      // get the current food entry
-                      LogEntry entry = dailyLog.entries[index];
-                      // wrap in Dismissible so the user can swipe to delete
-                      return Dismissible(
-                        key: Key(index.toString()), // needs a unique key
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          color: Colors.red,
-                          child: Padding(
-                            padding: EdgeInsets.only(right: 16.0),
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Icon(Icons.delete, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                        onDismissed: (direction) {
-                          // remove the entry and refresh the totals
-                          setState(() {
-                            dailyLog.removeEntry(index);
-                          });
-                        },
-                        child: Card(
-                          elevation: 1,
-                          margin: const EdgeInsets.symmetric(vertical: 4),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 4,
-                            ),
-                            title: Text(
-                              entry.foodItem.name,
+        ),
+        Expanded(
+          child: nutrition.dailyLog.isEmpty
+              ? const Center(child: Text("No food logged for today yet."))
+              : ListView.builder(
+                  itemCount: nutrition.dailyLog.length,
+                  itemBuilder: (context, i) {
+                    final item = nutrition.dailyLog[i];
+                    return Dismissible(
+                      key: Key(item.id),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        color: Colors.red,
+                        child: const Icon(Icons.delete, color: Colors.white),
+                      ),
+                      onDismissed: (_) => Provider.of<NutritionProvider>(
+                        context,
+                        listen: false,
+                      ).removeFromDailyLog(item.id),
+                      child: ListTile(
+                        title: Text(item.name),
+                        subtitle: Text('${item.servings} servings'),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '${(item.calories * item.servings).toStringAsFixed(0)} Cal',
                               style: const TextStyle(
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                            subtitle: Text("Servings: ${entry.servings}"),
-                            // Visual cue: hints that there is more "to the right"
-                            trailing: Icon(
-                              Icons.chevron_left,
-                              color: Colors.grey[400],
+                            IconButton(
+                              icon: const Icon(Icons.edit, size: 20),
+                              onPressed: () =>
+                                  _showEditServingsDialog(context, item),
                             ),
-                          ),
+                          ],
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
+    );
+  }
+
+  void _showEditServingsDialog(BuildContext context, FoodItem item) {
+    final controller = TextEditingController(text: item.servings.toString());
+    showDialog(
+      context: context,
+      builder: (buildContext) => AlertDialog(
+        title: Text('Edit ${item.name}'),
+        content: TextField(
+          controller: controller,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: const InputDecoration(
+            labelText: 'Number of Servings',
+            border: OutlineInputBorder(),
+          ),
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(buildContext),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final servings = double.tryParse(controller.text);
+              if (servings != null && servings > 0) {
+                Provider.of<NutritionProvider>(
+                  buildContext,
+                  listen: false,
+                ).updateDailyLogServings(item.id, servings);
+              }
+              Navigator.pop(buildContext);
+            },
+            child: const Text('Save'),
           ),
         ],
       ),
-      // button to go to the food library screen
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => FoodLibraryScreen(
-                foodLibrary: foodLibrary,
-                dailyLog: dailyLog,
-              ),
+    );
+  }
+
+  Widget _buildSummaryCard(NutritionProvider nutrition) {
+    return Card(
+      elevation: 4,
+      margin: const EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: _buildStatCell(
+                    'Calories',
+                    nutrition.totalDailyCalories.toStringAsFixed(0),
+                  ),
+                ),
+                Container(width: 1, height: 50, color: Colors.grey[300]),
+                Expanded(
+                  child: _buildStatCell(
+                    'Protein (g)',
+                    nutrition.totalDailyProtein.toStringAsFixed(1),
+                  ),
+                ),
+              ],
             ),
-          );
-          setState(() {});
-        },
-        label: const Text("Add Food"),
-        icon: const Icon(Icons.add),
+            const Divider(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildStatCell(
+                    'Fat (g)',
+                    nutrition.totalDailyFat.toStringAsFixed(1),
+                  ),
+                ),
+                Container(width: 1, height: 50, color: Colors.grey[300]),
+                Expanded(
+                  child: _buildStatCell(
+                    'Carbs (g)',
+                    nutrition.totalDailyCarbs.toStringAsFixed(1),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
-}
 
-Widget _buildStatRow(String label, String value) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(vertical: 4.0),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildStatCell(String label, String value) {
+    return Column(
       children: [
-        Text(label, style: TextStyle(color: Colors.grey, fontSize: 16)),
-        Text(value, style: TextStyle(fontSize: 16)),
+        Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
       ],
-    ),
-  );
+    );
+  }
 }
