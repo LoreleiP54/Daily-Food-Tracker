@@ -1,0 +1,112 @@
+import 'package:flutter/material.dart';
+import '../models/food_item.dart';
+import '../models/food_library.dart';
+
+class AddFoodScreen extends StatefulWidget {
+  final FoodLibrary foodLibrary;
+
+  const AddFoodScreen({super.key, required this.foodLibrary});
+
+  @override
+  State<AddFoodScreen> createState() => _AddFoodScreenState();
+}
+
+class _AddFoodScreenState extends State<AddFoodScreen> {
+  // one controller for each text field
+  TextEditingController nameController = TextEditingController();
+  TextEditingController caloriesController = TextEditingController();
+  TextEditingController proteinController = TextEditingController();
+  TextEditingController carbsController = TextEditingController();
+  TextEditingController fatController = TextEditingController();
+
+  void saveFood() {
+    // make sure the name field isnt empty before saving
+    if (nameController.text == "") {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Please enter a food name")));
+      return;
+    }
+
+    // make sure all the number fields have something in them
+    if (caloriesController.text == "" ||
+        proteinController.text == "" ||
+        carbsController.text == "" ||
+        fatController.text == "") {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please fill in all nutrition fields")),
+      );
+      return;
+    }
+
+    // convert the text inputs to numbers
+    double calories, protein, carbs, fat;
+    try {
+      // wrapped in a try-catch since it will make an exception if the input is not numeric
+      calories = double.parse(caloriesController.text);
+      protein = double.parse(proteinController.text);
+      carbs = double.parse(carbsController.text);
+      fat = double.parse(fatController.text);
+    } catch(e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please ensure all nutrition fields are numeric")),
+      );
+      return;
+    }
+
+    // create the new food item and add it to the library
+    FoodItem newFood = FoodItem(
+      name: nameController.text,
+      caloriesPerServing: calories,
+      proteinPerServing: protein,
+      carbsPerServing: carbs,
+      fatPerServing: fat,
+    );
+
+    widget.foodLibrary.addFood(newFood);
+
+    // go back to the previous screen
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("Add New Food")),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: nameController,
+              decoration: InputDecoration(labelText: "Food Name"),
+            ),
+            TextField(
+              controller: caloriesController,
+              decoration: InputDecoration(labelText: "Calories per Serving"),
+              keyboardType: TextInputType.number,
+            ),
+            TextField(
+              controller: proteinController,
+              decoration: InputDecoration(labelText: "Protein (g)"),
+              keyboardType: TextInputType.number,
+            ),
+            TextField(
+              controller: carbsController,
+              decoration: InputDecoration(labelText: "Carbs (g)"),
+              keyboardType: TextInputType.number,
+            ),
+            TextField(
+              controller: fatController,
+              decoration: InputDecoration(labelText: "Fat (g)"),
+              keyboardType: TextInputType.number,
+            ),
+            // some space before the button
+            SizedBox(height: 20),
+            ElevatedButton(onPressed: saveFood, child: Text("Save Food")),
+          ],
+        ),
+      ),
+    );
+  }
+}
